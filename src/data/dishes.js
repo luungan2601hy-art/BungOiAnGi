@@ -583,6 +583,33 @@ export const dishes = [
   },
 ];
 
+const dishImageOverrides = {
+  2: 'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=600&q=85',
+  3: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=85',
+  4: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&q=85',
+  5: 'https://images.unsplash.com/photo-1601050690117-94f5f6fa8bd7?w=600&q=85',
+  6: 'https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=600&q=85',
+  7: 'https://images.unsplash.com/photo-1603073163308-9654c3fb70b5?w=600&q=85',
+  8: 'https://images.unsplash.com/photo-1496116218417-1a781b1c416c?w=600&q=85',
+  11: 'https://images.unsplash.com/photo-1529042410759-befb1204b468?w=600&q=85',
+  12: 'https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=600&q=85',
+  15: 'https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&q=85',
+  16: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&q=85',
+  17: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=85',
+  21: 'https://images.unsplash.com/photo-1553163147-622ab57be1c7?w=600&q=85',
+  23: 'https://images.unsplash.com/photo-1585032226651-759b368d7246?w=600&q=85',
+  25: 'https://images.unsplash.com/photo-1593560708920-61dd98c8c8d4?w=600&q=85',
+  29: 'https://images.unsplash.com/photo-1532550907401-a500c9a57435?w=600&q=85',
+  31: 'https://images.unsplash.com/photo-1552611052-33e04de081de?w=600&q=85',
+  34: 'https://images.unsplash.com/photo-1579751626657-72bc17010498?w=600&q=85',
+  35: 'https://images.unsplash.com/photo-1544025162-d76694265947?w=600&q=85',
+};
+
+Object.entries(dishImageOverrides).forEach(([id, image]) => {
+  const dish = dishes.find(item => item.id === Number(id));
+  if (dish) dish.img = image;
+});
+
 const vegetarianDishIds = new Set([10, 14, 18, 19, 20, 27, 30, 33]);
 dishes.forEach(dish => {
   dish.diet = vegetarianDishIds.has(dish.id) ? 'chay' : 'man';
