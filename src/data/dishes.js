@@ -583,17 +583,24 @@ export const dishes = [
   },
 ];
 
+const vegetarianDishIds = new Set([10, 14, 18, 19, 20, 27, 30, 33]);
+dishes.forEach(dish => {
+  dish.diet = vegetarianDishIds.has(dish.id) ? 'chay' : 'man';
+});
+
 export const popularDishes = dishes.filter(d => d.popular);
 export const newDishes = dishes.filter(d => !d.popular).slice(0, 8);
 
-export function filterDishes(moodId, budgetId, categoryId = 'all', query = '') {
+export function filterDishes(moodId, budgetId, categoryId = 'all', query = '', diet = 'all', tags = []) {
   return dishes.filter(d => {
     const matchMood = !moodId || d.moods.includes(moodId);
     const budget = BUDGETS.find(b => b.id === budgetId);
     const matchBudget = !budget || budget.id === 'all' || (d.price >= budget.min && d.price <= budget.max);
     const matchCat = categoryId === 'all' || d.category === categoryId;
     const matchQuery = !query || d.name.toLowerCase().includes(query.toLowerCase()) || d.tags.some(t => t.toLowerCase().includes(query.toLowerCase()));
-    return matchMood && matchBudget && matchCat && matchQuery;
+    const matchDiet = diet === 'all' || d.diet === diet;
+    const matchTags = tags.length === 0 || tags.every(tag => d.tags.includes(tag));
+    return matchMood && matchBudget && matchCat && matchQuery && matchDiet && matchTags;
   });
 }
 

@@ -14,6 +14,9 @@ const state = {
   activePage: 'home',
   mood: null,
   budget: 'all',
+  exploreDiet: 'all',
+  exploreTags: [],
+  exploreSort: 'default',
   favorites: JSON.parse(localStorage.getItem('bung_favs') || '[]'),
   // Wheel
   wheelItems: [],
@@ -159,6 +162,10 @@ function renderExplore() {
   const catBtns = CATEGORIES.map(c => `
     <button class="cat-btn ${c.id === 'all' ? 'active' : ''}" data-cat="${c.id}" id="cat-${c.id}">${c.label}</button>
   `).join('');
+  const tagOptions = ['Cay', 'Healthy', 'Rẻ', 'Nướng', 'Miền Bắc', 'Miền Nam', 'Đường phố', 'Classic'];
+  const tagBtns = tagOptions.map(tag => `
+    <button class="tag-filter-btn" data-tag="${tag}">${tag}</button>
+  `).join('');
 
   return `
     <div class="explore-header">
@@ -173,6 +180,30 @@ function renderExplore() {
     </div>
     <div class="category-tabs" id="cat-tabs">${catBtns}</div>
     <div class="explore-grid-wrap">
+      <div class="explore-filters">
+        <div class="filter-group">
+          <label for="explore-diet">Loại món</label>
+          <select id="explore-diet" class="filter-select">
+            <option value="all">Tất cả</option>
+            <option value="chay">Món chay</option>
+            <option value="man">Món mặn</option>
+          </select>
+        </div>
+        <div class="filter-group filter-tags">
+          <span class="filter-label">Tag</span>
+          <div class="tag-filter-list">${tagBtns}</div>
+        </div>
+        <div class="filter-group">
+          <label for="explore-sort">Sắp xếp</label>
+          <select id="explore-sort" class="filter-select">
+            <option value="default">Mặc định</option>
+            <option value="price-asc">Giá thấp đến cao</option>
+            <option value="price-desc">Giá cao đến thấp</option>
+            <option value="rating">Đánh giá cao nhất</option>
+            <option value="calo">Calories thấp nhất</option>
+          </select>
+        </div>
+      </div>
       <p class="explore-count" id="explore-count">${dishes.length} món</p>
       <div class="dishes-grid" id="explore-grid">
         ${renderDishCards(dishes)}
@@ -839,6 +870,28 @@ function bindAll() {
     });
   });
 
+  document.getElementById('explore-diet')?.addEventListener('change', (e) => {
+    state.exploreDiet = e.target.value;
+    updateExploreGrid();
+  });
+
+  document.querySelectorAll('.tag-filter-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      playClick();
+      const tag = btn.dataset.tag;
+      state.exploreTags = state.exploreTags.includes(tag)
+        ? state.exploreTags.filter(item => item !== tag)
+        : [...state.exploreTags, tag];
+      btn.classList.toggle('active', state.exploreTags.includes(tag));
+      updateExploreGrid();
+    });
+  });
+
+  document.getElementById('explore-sort')?.addEventListener('change', (e) => {
+    state.exploreSort = e.target.value;
+    updateExploreGrid();
+  });
+
   // Quiz
   document.querySelectorAll('.quiz-opt').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -921,7 +974,11 @@ function bindDishCards() {
 function updateExploreGrid() {
   const query = document.getElementById('explore-search')?.value || '';
   const activecat = document.querySelector('.cat-btn.active')?.dataset.cat || 'all';
-  const results = filterDishes(null, 'all', activecat, query);
+  const results = filterDishes(null, 'all', activecat, query, state.exploreDiet, state.exploreTags);
+  if (state.exploreSort === 'price-asc') results.sort((a, b) => a.price - b.price);
+  if (state.exploreSort === 'price-desc') results.sort((a, b) => b.price - a.price);
+  if (state.exploreSort === 'rating') results.sort((a, b) => b.rating - a.rating);
+  if (state.exploreSort === 'calo') results.sort((a, b) => a.calo - b.calo);
   const grid = document.getElementById('explore-grid');
   const count = document.getElementById('explore-count');
   if (grid) grid.innerHTML = renderDishCards(results);
